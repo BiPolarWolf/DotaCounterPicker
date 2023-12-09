@@ -9,8 +9,6 @@ def main():
 
 
 
-
-
 #Функция создает таблицу Hero в базе данных dota_counter_picks.db
 def create_hero_table():
     conn = None
@@ -34,10 +32,6 @@ def create_hero_table():
     finally:
         if conn != None:
             conn.close()
-
-
-
-
 
 
 
