@@ -1,8 +1,10 @@
 import sqlite3
 import tkinter
+import tkinter.messagebox
 from tkinter.scrolledtext import ScrolledText
 
-table_list = ['Heroes','Roles','HeroRoles']
+
+table_list = ['Heroes','Roles']
 class InsertMenu():
     def __init__(self):
 
@@ -101,7 +103,7 @@ class Insert_in_Heroes:
 
 
         self.insert_frame = tkinter.Frame(self.main_window,bg='orange').pack(side='bottom',padx=10,pady=10)
-        self.insert_button = tkinter.Button(self.insert_frame,text='Добавить в базу данных').pack(side = 'bottom',pady=10)
+        self.insert_button = tkinter.Button(self.insert_frame,text='Добавить в базу данных',command=self.insert_in_database).pack(side = 'bottom',pady=10)
 
 
         self.title.pack(side='top',pady=5,padx=10)
@@ -172,8 +174,80 @@ class Insert_in_Heroes:
         print(text.strip())
 
 
+    def insert_in_database(self):
+        name = self.get_name.get()
+        attribute = self.get_attr.get()
+        description = self.get_descr.get().replace('\n', ' ')
+
+        conn = None
+
+        try:
+            conn = sqlite3.connect('dota_counter_picks.db')
+            cur = conn.cursor()
+
+            cur.execute('''INSERT INTO Heroes (Name,Attribute,Description) VALUES (?,?,?)''',(name,attribute,description))
+            tkinter.messagebox.showinfo('Обновление',f'Запись о герое {name}  добавлена в базу данных !')
+
+            conn.commit()
+        except sqlite3.Error as err :
+            tkinter.messagebox.showerror('Ошибка','Данные не прошли по причине :\n'+err)
+        finally:
+            if conn !=None:
+                conn.close()
+
+
+class AddRole :
+    def __init__(self):
+        self.main_window = tkinter.Tk()
+
+        self.title = tkinter.Label(self.main_window, text='Добавление новой роли').pack(side='top')
+        self.top_frame = tkinter.Frame(self.main_window).pack(side='top')
+
+        self.name_label = tkinter.Label(self.top_frame,text='Название :').pack(side='top')
+        self.name_entry = tkinter.Entry(self.top_frame)
+
+        self.descr_text = tkinter.scrolledtext.ScrolledText(self.top_frame,width=30,height=10)
+
+
+
+        self.name_entry.pack(side='top')
+        self.description_label = tkinter.Label(self.top_frame, text='Описание :').pack(side='top')
+        self.descr_text.pack(side='top')
+
+        self.bottom_frame = tkinter.Frame(self.main_window).pack(side='top')
+        self.to_db_button = tkinter.Button(self.bottom_frame, text='Добавить в базу данных',
+                                           command=self.add_to_db).pack(side='top')
+
+        tkinter.mainloop()
+
+
+    def add_to_db(self):
+        name = self.name_entry.get()
+        description = self.descr_text.get('1.0',tkinter.END)
+        if name == '' or description == '':
+            tkinter.messagebox.showerror("Ошибка",'Вы отправили пустые строки это не допустимо')
+        else:
+
+            conn = None
+
+            try:
+                conn = sqlite3.connect('dota_counter_picks.db')
+                cur = conn.cursor()
+
+                cur.execute('''INSERT INTO Roles (Name,Description) VALUES (?,?)''',
+                            (name, description))
+                tkinter.messagebox.showinfo('Обновление', f'Запись Роли {name}  добавлена в базу данных !')
+
+                conn.commit()
+            except sqlite3.Error as err:
+                tkinter.messagebox.showerror('Ошибка', 'Данные не прошли по причине :\n'+str(err))
+            finally:
+                if conn != None:
+                    conn.close()
+
 
 
 if __name__ == '__main__':
     insertMenu = InsertMenu()
     insert_in_Heroes = Insert_in_Heroes()
+    add_role = AddRole()
