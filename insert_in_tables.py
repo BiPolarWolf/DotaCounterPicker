@@ -4,7 +4,7 @@ import tkinter.messagebox
 from tkinter.scrolledtext import ScrolledText
 
 
-table_list = ['Heroes','Roles']
+
 class InsertMenu():
     def __init__(self):
 
@@ -12,30 +12,35 @@ class InsertMenu():
         self.main_window = tkinter.Tk()
 
         # Лейбл подсказка будет выше листбокса и фрейма как заголовок
-        self.title = tkinter.Label(self.main_window, text='Список Таблиц')
+        self.title = tkinter.Label(self.main_window, text='Выбрать таблицу')
 
         # создание фрейма для размещения листбокса с списом таблиц в базе
         self.tables_frame = tkinter.Frame(self.main_window,borderwidth=2,relief='ridge')
 
-        #создается объект listvariable хранящий список для внесение его в листбокс
-        self.tables = tkinter.Variable(value=table_list)
+        self.menu = tkinter.IntVar(value=1)
+        self.add_hero = tkinter.Radiobutton(self.tables_frame,text='Heroes',value=1,variable=self.menu)
+        self.add_role = tkinter.Radiobutton(self.tables_frame,text='Roles',value=2,variable=self.menu)
+        self.choice_button = tkinter.Button(self.tables_frame,text='Выбрать',command=self.do_something)
 
-        # создается лист бокс с уже вложенным списком таблиц и скроллбар для этого листбокса
-        self.table_list = tkinter.Listbox(self.tables_frame,listvariable=self.tables,height=4)
-        self.table_scroll = tkinter.Scrollbar(self.tables_frame)
-
-        #идет настройка взаимодействия листбокса и скроллбара (связка)
-        self.table_list.config(yscrollcommand=self.table_scroll.set)
-        self.table_scroll.config(command=self.table_list.yview)
-
-
-        # упаковывается все штуки
-        self.table_list.pack(side='left',)
-        self.table_scroll.pack(side='right',fill=tkinter.Y)
         self.title.pack(side='top', padx=10, pady=10)
         self.tables_frame.pack(side='top',padx=10,pady=(0,10))
 
+        self.add_hero.pack(side='top')
+        self.add_role.pack(side='top')
+        self.choice_button.pack(side='top')
         tkinter.mainloop()
+
+
+    def do_something(self):
+        choice = self.menu.get()
+
+        if choice == 1:
+            self.main_window.destroy()
+            insert_in_Heroes = Insert_in_Heroes()
+        elif choice == 2:
+            self.main_window.destroy()
+            add_role = AddRole()
+
 
 # создание записи в таблице Heroes
 class Insert_in_Heroes:
@@ -65,7 +70,7 @@ class Insert_in_Heroes:
         # создаются фрейм для фрейма get_frame в нем будет показано введенное имя
         self.name_frame =tkinter.Frame(self.get_frame)
         self.name_label_prompt= tkinter.Label(self.name_frame,text='Имя : ')
-        self.get_name = tkinter.StringVar(value='Неизвестно')
+        self.get_name = tkinter.StringVar(value='')
         self.name_label_value = tkinter.Label(self.name_frame,textvariable=self.get_name)
 
 
@@ -103,7 +108,7 @@ class Insert_in_Heroes:
 
 
         self.insert_frame = tkinter.Frame(self.main_window,bg='orange').pack(side='bottom',padx=10,pady=10)
-        self.insert_button = tkinter.Button(self.insert_frame,text='Добавить в базу данных',command=self.insert_in_database).pack(side = 'bottom',pady=10)
+        self.insert_button = tkinter.Button(self.insert_frame,text='Добавить в базу данных',command=self.insert_in_database)
 
 
         self.title.pack(side='top',pady=5,padx=10)
@@ -142,8 +147,16 @@ class Insert_in_Heroes:
         self.post_description.pack(side='top')
         self.get_descr_button.pack(side='top',pady=10)
 
+        self.insert_button.pack(side = 'top',pady=10)
+
+        self.close_button = tkinter.Button(self.insert_frame, text='Закончить', command=self.close)
+        self.close_button.pack(side='top')
+
         tkinter.mainloop()
 
+    def close(self):
+        self.main_window.destroy()
+        insertMenu = InsertMenu()
 
 # Функция для отображения выбора аттрибута в get_frame
     def display_choice(self):
@@ -178,22 +191,23 @@ class Insert_in_Heroes:
         name = self.get_name.get()
         attribute = self.get_attr.get()
         description = self.get_descr.get().replace('\n', ' ')
-
         conn = None
+        if name == ''  or description == '':
+            tkinter.messagebox.showerror("Ошибка",'Вы отправили пустые строки это не допустимо')
+        else:
+            try:
+                conn = sqlite3.connect('dota_counter_picks.db')
+                cur = conn.cursor()
 
-        try:
-            conn = sqlite3.connect('dota_counter_picks.db')
-            cur = conn.cursor()
+                cur.execute('''INSERT INTO Heroes (Name,Attribute,Description) VALUES (?,?,?)''',(name,attribute,description))
+                tkinter.messagebox.showinfo('Обновление',f'Запись о герое {name}  добавлена в базу данных !')
 
-            cur.execute('''INSERT INTO Heroes (Name,Attribute,Description) VALUES (?,?,?)''',(name,attribute,description))
-            tkinter.messagebox.showinfo('Обновление',f'Запись о герое {name}  добавлена в базу данных !')
-
-            conn.commit()
-        except sqlite3.Error as err :
-            tkinter.messagebox.showerror('Ошибка','Данные не прошли по причине :\n'+err)
-        finally:
-            if conn !=None:
-                conn.close()
+                conn.commit()
+            except sqlite3.Error as err :
+                tkinter.messagebox.showerror('Ошибка','Данные не прошли по причине :\n'+err)
+            finally:
+                if conn !=None:
+                    conn.close()
 
 
 class AddRole :
@@ -218,8 +232,14 @@ class AddRole :
         self.to_db_button = tkinter.Button(self.bottom_frame, text='Добавить в базу данных',
                                            command=self.add_to_db).pack(side='top')
 
+        self.close_button = tkinter.Button(self.bottom_frame,text='Закончить',command=self.close)
+        self.close_button.pack(side='top')
+
         tkinter.mainloop()
 
+    def close(self):
+        self.main_window.destroy()
+        insertMenu = InsertMenu()
 
     def add_to_db(self):
         name = self.name_entry.get()
@@ -246,8 +266,5 @@ class AddRole :
                     conn.close()
 
 
-
 if __name__ == '__main__':
     insertMenu = InsertMenu()
-    insert_in_Heroes = Insert_in_Heroes()
-    add_role = AddRole()
