@@ -3,13 +3,10 @@ import sqlite3
 
 
 def main():
-    create_roles_table()
     create_hero_table()
-    create_hero_roles_relation()
-    create_weaknesses_strengths()
-    create_Hero_sides_relation()
-
-
+    create_feature_table()
+    create_hero_feature_relation()
+    create_feature_vs_feature()
 
 #Функция создает таблицу Hero в базе данных dota_counter_picks.db
 def create_hero_table():
@@ -20,7 +17,7 @@ def create_hero_table():
 
         cur.execute('''CREATE TABLE IF NOT EXISTS Heroes(
                         id INTEGER PRIMARY KEY,
-                        Name TEXT,
+                        Name TEXT UNIQUE,
                         Attribute TEXT,
                         Description TEXT
         )''')
@@ -39,19 +36,19 @@ def create_hero_table():
 
 
 # Функция создает таблицу Roles в базе данных dota_counter_picks.db
-def create_roles_table():
+def create_feature_table():
     conn = None
     try:
         conn = sqlite3.connect('dota_counter_picks.db')
         cur = conn.cursor()
 
-        cur.execute('''CREATE TABLE IF NOT EXISTS Roles (
+        cur.execute('''CREATE TABLE IF NOT EXISTS Feature(
                         id INTEGER PRIMARY KEY,
-                        Name TEXT,
+                        Name TEXT UNIQUE,
                         Description TEXT
         )''')
 
-        print('Таблица данных "Roles" создана')
+        print('Таблица данных "Feature" создана')
         conn.commit()
 
     except sqlite3.Error as err:
@@ -63,20 +60,22 @@ def create_roles_table():
 
 
 #Функция создает связь между Героем и его Ролями в игре
-def create_hero_roles_relation():
+def create_hero_feature_relation():
     conn = None
     try:
         conn = sqlite3.connect('dota_counter_picks.db')
         cur = conn.cursor()
 
-        cur.execute('''CREATE TABLE IF NOT EXISTS HeroRoles(
+        cur.execute('''CREATE TABLE IF NOT EXISTS Hero_feature(
                         id INTEGER PRIMARY KEY,
                         hero_id INTEGER,
-                        role_id INTEGER,
+                        feature_id INTEGER,
+                        level INTEGER,
                         FOREIGN KEY (hero_id) REFERENCES Heroes(id),
-                        FOREIGN KEY (role_id) REFERENCES Roles(id)
+                        FOREIGN KEY (feature_id) REFERENCES Feature(id)
+                        
                         )''')
-        print('Связующая таблица для Heroes and Roles создана')
+        print('Связующая таблица для Heroes and Feature создана')
         conn.commit()
     except sqlite3.Error as err:
         print('Ошибка базы данных ', err)
@@ -85,48 +84,27 @@ def create_hero_roles_relation():
             conn.close()
 
 
-def create_weaknesses_strengths():
+def create_feature_vs_feature():
     conn = None
     try:
         conn = sqlite3.connect('dota_counter_picks.db')
         cur = conn.cursor()
 
-        cur.execute('''CREATE TABLE IF NOT EXISTS Sides(
+        cur.execute('''CREATE TABLE IF NOT EXISTS Feature_vs_feature(
                         id INTEGER PRIMARY KEY,
-                        side TEXT,
-                        status INTEGER,
-                        description TEXT
+                        winner_id INTEGER,
+                        loser_id INTEGER,
+                        FOREIGN KEY (winner_id) REFERENCES Feature(id),
+                        FOREIGN KEY (loser_id) REFERENCES Feature(id)
+
                         )''')
-        print(f'Таблица Sides создана')
+        print('Связующая таблица для Feature and Feature создана')
         conn.commit()
     except sqlite3.Error as err:
         print('Ошибка базы данных ', err)
     finally:
         if conn != None:
             conn.close()
-
-
-def create_Hero_sides_relation():
-    conn = None
-    try:
-        conn = sqlite3.connect('dota_counter_picks.db')
-        cur = conn.cursor()
-
-        cur.execute('''CREATE TABLE IF NOT EXISTS HeroRoles(
-                        id INTEGER PRIMARY KEY,
-                        hero_id INTEGER,
-                        side_id INTEGER,
-                        FOREIGN KEY (hero_id) REFERENCES Heroes(id),
-                        FOREIGN KEY (side_id) REFERENCES Sides(id)
-                        )''')
-        print('Связующая таблица для Heroes and Sides создана')
-        conn.commit()
-    except sqlite3.Error as err:
-        print('Ошибка базы данных ',err)
-    finally:
-        if conn != None:
-            conn.close()
-
 
 if __name__ == '__main__':
     main()
