@@ -4,7 +4,7 @@ import tkinter.messagebox
 from tkinter.scrolledtext import ScrolledText
 
 
-
+#Меню выбора
 class InsertMenu():
     def __init__(self):
 
@@ -209,7 +209,7 @@ class Insert_in_Heroes:
                 if conn !=None:
                     conn.close()
 
-
+# создание записи в таблице Roles
 class AddRole :
     def __init__(self):
         self.main_window = tkinter.Tk()

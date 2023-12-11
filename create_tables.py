@@ -6,6 +6,8 @@ def main():
     create_roles_table()
     create_hero_table()
     create_hero_roles_relation()
+    create_weaknesses_strengths()
+    create_Hero_sides_relation()
 
 
 
@@ -83,8 +85,47 @@ def create_hero_roles_relation():
             conn.close()
 
 
+def create_weaknesses_strengths():
+    conn = None
+    try:
+        conn = sqlite3.connect('dota_counter_picks.db')
+        cur = conn.cursor()
+
+        cur.execute('''CREATE TABLE IF NOT EXISTS Sides(
+                        id INTEGER PRIMARY KEY,
+                        side TEXT,
+                        status INTEGER,
+                        description TEXT
+                        )''')
+        print(f'Таблица Sides создана')
+        conn.commit()
+    except sqlite3.Error as err:
+        print('Ошибка базы данных ', err)
+    finally:
+        if conn != None:
+            conn.close()
 
 
+def create_Hero_sides_relation():
+    conn = None
+    try:
+        conn = sqlite3.connect('dota_counter_picks.db')
+        cur = conn.cursor()
+
+        cur.execute('''CREATE TABLE IF NOT EXISTS HeroRoles(
+                        id INTEGER PRIMARY KEY,
+                        hero_id INTEGER,
+                        side_id INTEGER,
+                        FOREIGN KEY (hero_id) REFERENCES Heroes(id),
+                        FOREIGN KEY (side_id) REFERENCES Sides(id)
+                        )''')
+        print('Связующая таблица для Heroes and Sides создана')
+        conn.commit()
+    except sqlite3.Error as err:
+        print('Ошибка базы данных ',err)
+    finally:
+        if conn != None:
+            conn.close()
 
 
 if __name__ == '__main__':
