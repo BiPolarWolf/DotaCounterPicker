@@ -1,0 +1,63 @@
+
+Создание Таблиц create_tables.py
+
+
+        #Функция создает таблицу Hero в базе данных dota_counter_picks.db
+        create_hero_table()
+
+        # Функция создает таблицу Roles в базе данных dota_counter_picks.db
+        def create_feature_table()
+
+        #Функция создает связь между Героем и его Ролями в игре
+        def create_hero_feature_relation()
+
+        #создает связующую таблицу для
+        create_feature_vs_feature():
+
+
+
+##############################################################
+
+Выборка из таблиц select_from_tables.py
+
+
+        #выбирает все оссобенности определенного персонажа по его айди
+        select_hero_features(hero_id)
+
+        #Выбирает все записи о конкурирующих между собой способностях по id оссобенности которая слабее
+        select_counter_features(loser_id)
+
+        # возвращает полное описание Персонажа  по его id
+        select_hero_info(hero_id)
+
+        # должна подбирать контр пики для определенного Героя
+        select_counter_heroes()
+
+        # выбирает все id и Имена персонажей из таблицы Heroes
+        select_heroes_names()
+
+        # возвращает полное описание оссобенности по ее id
+        select_feature_info(feature_id)
+
+        # выбирает список всех оссобеностей которые только могут быть
+        def select_features()
+
+
+
+##################################################################
+
+Добавления в таблицы insert_in_tables.py
+
+
+        #Функция перебирает все записи о героях из API и добавляет каждого в базу через фунцкию hero_insert
+        insert_all_heroes(Heroes)
+
+        #Функция добавляет персонажа в базу данных таблицу Heroes
+        hero_insert(hero_info:dict)
+
+        #Функция для добавления оссобенности с ее названием и описанием
+        feature_insert(feature_info)
+
+        #Функция для добавления Герою оссобенности из списка и указанию силы этой оссобенности
+        Hero_feature_insert(hero_feature_info:dict)
+

@@ -88,6 +88,7 @@ def create_hero_feature_relation():
             conn.close()
 
 
+#создает связующую таблицу для
 def create_feature_vs_feature():
     conn = None
     try:
