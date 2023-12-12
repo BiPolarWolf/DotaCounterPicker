@@ -3,7 +3,7 @@ import sqlite3
 def delete_heroes():
     conn = None
     try:
-        conn = sqlite3.connect('dota_counter_picks.db')
+        conn = sqlite3.connect('../dota_counter_picks.db')
         cur = conn.cursor()
 
         cur.execute(''' DROP TABLE IF EXISTS Heroes''')

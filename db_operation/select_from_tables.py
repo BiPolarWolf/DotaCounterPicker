@@ -18,7 +18,7 @@ def select_hero_features(hero_id):
     conn = None
     results = []
     try:
-        conn = sqlite3.connect('dota_counter_picks.db')
+        conn = sqlite3.connect('../dota_counter_picks.db')
         cur = conn.cursor()
         cur.execute('''SELECT hero_id,feature_id,level FROM Hero_feature WHERE hero_id == ?''',(hero_id))
 
@@ -37,7 +37,7 @@ def  select_counter_features(loser_id):
     conn = None
     results = []
     try:
-        conn = sqlite3.connect('dota_counter_picks.db')
+        conn = sqlite3.connect('../dota_counter_picks.db')
         cur = conn.cursor()
         cur.execute('''SELECT * FROM Feature_vs_feature WHERE loser_id == ?''',(loser_id,))
 
@@ -55,7 +55,7 @@ def select_hero_info(hero_id):
     conn = None
     result = None
     try:
-        conn = sqlite3.connect('dota_counter_picks.db')
+        conn = sqlite3.connect('../dota_counter_picks.db')
         cur = conn.cursor()
 
         cur.execute('''SELECT * FROM Heroes WHERE id == ?''',(hero_id,))
@@ -79,7 +79,7 @@ def select_heroes_names():
     conn = None
     result = []
     try:
-        conn = sqlite3.connect('dota_counter_picks.db')
+        conn = sqlite3.connect('../dota_counter_picks.db')
         cur = conn.cursor()
 
         cur.execute('''SELECT id,Name FROM Heroes ''')
@@ -98,7 +98,7 @@ def select_feature_info(feature_id):
     conn = None
     result = None
     try:
-        conn = sqlite3.connect('dota_counter_picks.db')
+        conn = sqlite3.connect('../dota_counter_picks.db')
         cur = conn.cursor()
 
         cur.execute('''SELECT * FROM Feature WHERE id == ?''', (feature_id,))
@@ -117,7 +117,7 @@ def select_features():
     conn = None
     result = None
     try:
-        conn = sqlite3.connect('dota_counter_picks.db')
+        conn = sqlite3.connect('../dota_counter_picks.db')
         cur = conn.cursor()
 
         cur.execute('''SELECT id,Name FROM Feature ''')

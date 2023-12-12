@@ -12,7 +12,7 @@ def main():
 def create_hero_table():
     conn = None
     try:
-        conn = sqlite3.connect('dota_counter_picks.db')
+        conn = sqlite3.connect('../dota_counter_picks.db')
         cur = conn.cursor()
 
         cur.execute('''
@@ -41,7 +41,7 @@ def create_hero_table():
 def create_feature_table():
     conn = None
     try:
-        conn = sqlite3.connect('dota_counter_picks.db')
+        conn = sqlite3.connect('../dota_counter_picks.db')
         cur = conn.cursor()
 
         cur.execute('''
@@ -66,7 +66,7 @@ def create_feature_table():
 def create_hero_feature_relation():
     conn = None
     try:
-        conn = sqlite3.connect('dota_counter_picks.db')
+        conn = sqlite3.connect('../dota_counter_picks.db')
         cur = conn.cursor()
 
         cur.execute('''
@@ -92,7 +92,7 @@ def create_hero_feature_relation():
 def create_feature_vs_feature():
     conn = None
     try:
-        conn = sqlite3.connect('dota_counter_picks.db')
+        conn = sqlite3.connect('../dota_counter_picks.db')
         cur = conn.cursor()
 
         cur.execute('''
@@ -111,6 +111,7 @@ def create_feature_vs_feature():
     finally:
         if conn != None:
             conn.close()
+
 
 if __name__ == '__main__':
     main()

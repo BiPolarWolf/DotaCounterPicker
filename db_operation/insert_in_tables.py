@@ -16,7 +16,7 @@ def insert_all_heroes(Heroes):
 def hero_insert(hero_info:dict):
     conn = None
     try:
-        conn = sqlite3.connect('dota_counter_picks.db')
+        conn = sqlite3.connect('../dota_counter_picks.db')
         cur = conn.cursor()
 
         cur.execute('''INSERT INTO Heroes(Name,Attribute,Attack)
@@ -40,7 +40,7 @@ def hero_insert(hero_info:dict):
 def feature_insert(feature_info):
     conn = None
     try:
-        conn = sqlite3.connect('dota_counter_picks.db')
+        conn = sqlite3.connect('../dota_counter_picks.db')
         cur = conn.cursor()
         cur.execute('''INSERT INTO Feature(Name,Description) VALUES (?,?)''',
                     (feature_info[0],feature_info[1]))
@@ -54,10 +54,10 @@ def feature_insert(feature_info):
             conn.close()
 
 #Функция для добавления Герою оссобенности из списка и указанию силы этой оссобенности
-def Hero_feature_insert(hero_feature_info:dict):
+def insert_hero_feature(hero_feature_info:dict):
     conn = None
     try:
-        conn = sqlite3.connect('dota_counter_picks.db')
+        conn = sqlite3.connect('../dota_counter_picks.db')
         cur = conn.cursor()
 
         cur.execute('''INSERT INTO Hero_feature(hero_id,feature_id,level)
