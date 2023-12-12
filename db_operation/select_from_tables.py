@@ -75,14 +75,14 @@ def select_counter_heroes():
 
 
 # выбирает все id и Имена персонажей из таблицы Heroes
-def select_heroes_names():
+def select_heroes():
     conn = None
     result = []
     try:
         conn = sqlite3.connect('../dota_counter_picks.db')
         cur = conn.cursor()
 
-        cur.execute('''SELECT id,Name FROM Heroes ''')
+        cur.execute('''SELECT id,Name FROM Heroes ORDER BY id ''')
 
         results = cur.fetchall()
     except sqlite3.Error as err:
