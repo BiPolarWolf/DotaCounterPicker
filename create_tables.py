@@ -15,10 +15,12 @@ def create_hero_table():
         conn = sqlite3.connect('dota_counter_picks.db')
         cur = conn.cursor()
 
-        cur.execute('''CREATE TABLE IF NOT EXISTS Heroes(
+        cur.execute('''
+        CREATE TABLE IF NOT EXISTS Heroes(
                         id INTEGER PRIMARY KEY,
                         Name TEXT UNIQUE,
                         Attribute TEXT,
+                        Attack TEXT,
                         Description TEXT
         )''')
 
@@ -42,7 +44,8 @@ def create_feature_table():
         conn = sqlite3.connect('dota_counter_picks.db')
         cur = conn.cursor()
 
-        cur.execute('''CREATE TABLE IF NOT EXISTS Feature(
+        cur.execute('''
+        CREATE TABLE IF NOT EXISTS Feature(
                         id INTEGER PRIMARY KEY,
                         Name TEXT UNIQUE,
                         Description TEXT
@@ -66,7 +69,8 @@ def create_hero_feature_relation():
         conn = sqlite3.connect('dota_counter_picks.db')
         cur = conn.cursor()
 
-        cur.execute('''CREATE TABLE IF NOT EXISTS Hero_feature(
+        cur.execute('''
+        CREATE TABLE IF NOT EXISTS Hero_feature(
                         id INTEGER PRIMARY KEY,
                         hero_id INTEGER,
                         feature_id INTEGER,
@@ -90,7 +94,8 @@ def create_feature_vs_feature():
         conn = sqlite3.connect('dota_counter_picks.db')
         cur = conn.cursor()
 
-        cur.execute('''CREATE TABLE IF NOT EXISTS Feature_vs_feature(
+        cur.execute('''
+        CREATE TABLE IF NOT EXISTS Feature_vs_feature(
                         id INTEGER PRIMARY KEY,
                         winner_id INTEGER,
                         loser_id INTEGER,
