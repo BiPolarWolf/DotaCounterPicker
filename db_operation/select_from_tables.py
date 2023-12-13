@@ -20,7 +20,29 @@ def select_hero_features(hero_id):
     try:
         conn = sqlite3.connect('../dota_counter_picks.db')
         cur = conn.cursor()
-        cur.execute('''SELECT hero_id,feature_id,level FROM Hero_feature WHERE hero_id == ?''',(hero_id))
+        cur.execute('''SELECT hero_id,feature_id,level FROM Hero_feature WHERE hero_id == ?''',(hero_id,))
+
+        results = cur.fetchall()
+    except sqlite3.Error as err:
+        print('Ошибка базы данных ', err)
+    finally:
+        if conn != None:
+            conn.close()
+
+        return results
+
+def select_hero_features1(hero_id):
+    conn = None
+    results = []
+    try:
+        conn = sqlite3.connect('../dota_counter_picks.db')
+        cur = conn.cursor()
+        cur.execute('''SELECT Heroes.Name,Heroes.Description,Feature.Name,Feature.Description,level
+         FROM Hero_feature
+         JOIN Heroes ON Hero_feature.hero_id = Heroes.id
+         JOIN Feature ON Hero_feature.feature_id == Feature.id
+         
+         WHERE hero_id == ?''',(hero_id,))
 
         results = cur.fetchall()
     except sqlite3.Error as err:
