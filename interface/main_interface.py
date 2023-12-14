@@ -10,7 +10,7 @@ from PIL import Image
 CTk.set_appearance_mode('dark')
 
 
-
+#Хранит иконку информации которую можно использовать в интерфейсе
 info_icon = CTk.CTkImage(light_image=Image.open('D:\\pycharm_projects\\Dota_counter_pick\\images\\icon_info.png'),
                                   dark_image=Image.open("D:\\pycharm_projects\\Dota_counter_pick\\images\\icon_info.png"),
                                   size=(30, 30))
@@ -20,11 +20,14 @@ class Main(CTk.CTk):
     def __init__(self):
         super().__init__()
         self.title('DotaCounterPicker')
-        self.insert_feature = Insert_Feature(self)
-        self.insert_feature.grid(row=0,column=0,padx=(10,5),pady=10,sticky='nsew')
 
-        self.radio_heroes = Hero_list(self)
-        self.radio_heroes.grid(row=0,column=1,padx=(5,10),pady=10,sticky='nsew')
+        #Меню для добавления Записей о способностях
+        self.add_feature = Add_Feature(self)
+        self.add_feature.grid(row=0,column=0,padx=(10,5),pady=10,sticky='nsew')
+
+        #Меню с с скроллющимся списком персонажей и выбора одного из них чтобы показать его способности
+        self.hero_features_menu = Hero_list(self)
+        self.hero_features_menu.grid(row=0,column=1,padx=(5,10),pady=10,sticky='nsew')
 
 
 
@@ -32,48 +35,83 @@ class Main(CTk.CTk):
 class Hero_list(CTk.CTkFrame):
     def __init__(self,master):
         super().__init__(master)
+
+        #Заголовок сверху находится выше всех
         self.title_label = CTk.CTkLabel(self,text='Способности Персонажей')
         self.title_label.grid(row=0,column=0,columnspan=2,sticky='new',pady=10)
+
+        #Фрейм в котором  перебираются все персонажи (фрейм с автоматическим скроллом)
         self.heroes_frame = CTk.CTkScrollableFrame(self,width=150,height=300)
         self.heroes_frame.grid(row=1, column=0, sticky='nsew', padx=10,)
+        #Переменная для хранения айди Персонажа , которое определяется с помощью радио кнопок
         self.hero_id_var = CTk.IntVar(value=1)
+
+        #функция  select_heroes выбирает все айди и имена для всех персонажей из таблицы Heroes
         heroes = select_heroes()
+
+        #внутри фрейма heroes_frame создаются радио кнопки соответствующие персонажу
+        # (информацию о выбранной кнопке будет хранить self.hero_id_var)
         for i,value in enumerate(heroes):
             radio_button = CTk.CTkRadioButton(self.heroes_frame,text=value[1],value=value[0],variable=self.hero_id_var)
             radio_button.grid(row=i,column=0,sticky='new',padx=10,pady=5)
+
+
+        #кнопка которая вызывает функцию get_hero разположена внутри фрейм класса Hero_list
         self.get_hero_button = CTk.CTkButton(self,text='Выбрать',command=self.get_hero)
         self.get_hero_button.grid(row=2,column=0,sticky='new',padx=10,pady=5)
 
-        #self.hero_feature_frame = Hero_Features(self,hero=self.get_hero())
-        #self.hero_feature_frame.grid(row=0,column=1,sticky='new')
 
 
+    # Функция которая создает фрейм для отображения способностей персонажа
     def get_hero(self):
+
+        # Функция получает айди персонажа из hero_id_var.get() в переменную hero_id
         hero_id = self.hero_id_var.get()
+
+        # далее вызываем функцию select_hero_info(hero_id) которая по айди достает всю информацию о персонаже
         hero_info = select_hero_info(hero_id)
-        self.hero_feature_frame = Hero_Features(self,hero=hero_info)
+
+        # создается Экземпляр класса Hero_features_menu который является новым фреймом для отображения способностей персонажа
+        self.hero_feature_frame = Hero_features_menu(self,hero=hero_info)
         self.hero_feature_frame.grid(row=1, column=1,padx=(0,10), sticky='new')
-        self.update_feature_description = CTk.CTkButton(self,text='Обновить описание',command=self.get_hero)
-        self.update_feature_description.grid(row=2, column=1, sticky='new',pady=5,padx=(0,10))
-    def update_feature_descr(self):
-        pass
 
 
-class Hero_Features(CTk.CTkFrame):
+
+class Hero_features_menu(CTk.CTkFrame):
     def __init__(self,master,hero):
         super().__init__(master)
+        #Лейбл для заголовка
         self.hero_label = CTk.CTkLabel(self,text=f'Способности героя : {hero[1]}')
         self.hero_label.grid(row=0,column=0,sticky='new')
+
+        # Скроллбар фрейм в котором будут храниться все способности выбранного персонажа  в виде радио кнопок
         self.features_bar = CTk.CTkScrollableFrame(self,width=300, height=200)
         self.features_bar.grid(row=1,column=0,sticky='new',padx=10,pady=5)
-        self.hero_features_list = select_hero_features1(hero_id=hero[0])
 
+        #переменная в которой будет список способностей для персонажа с выбранным айди
+        hero_features_list = select_hero_features1(hero_id=hero[0])
+
+        #Переменаая хранящая значение выбранной радио кнопки из фрейма self.features_bar
         self.selected_feature = CTk.StringVar(value='Описание способности')
-        print(self.hero_features_list)
-        for i,value in enumerate(self.hero_features_list):
 
+
+        #Перебор всех значений из списка hero_features_list и создания радио кнопок
+        for i,value in enumerate(hero_features_list):
+
+            # Лейбл в котором написан название способности и указан ее уровень для каждого персонажа
             label = CTk.CTkLabel(self.features_bar,text=f'{value[2]} ({ value[-1]}-level)')
             label.grid(row=i,column=0,sticky='new',padx=10,pady=5)
+
+
+            '''
+            Уровень 1 - белая запись : Значит что у Героя есть эта способность но особо важной роли она не играет
+            Уровень 2 - зеленая запись : Значит что у Героя есть способность которая может приносить не большие трудности врагу
+            Уровень 3 - голубая запись : Значит что у Героя есть способность которая может принести много проблем , стоит обратить на нее внимание
+            Уровень 4 - розовая запись : Значит что у Героя есть способность которую нужно обязательно чем то перекрыть , иначе возрастает шанс проиграть
+            Уровень 5 - оранжевая запись : Значит что у Героя есть способность которую если ничем не перекрыть , то вы проиграете
+            '''
+
+            # Сдесь происходит цветовая кастомизация лейбла выше взависимости от уровня способности
             if value[-1] ==1:
                 label.configure()
             if value[-1] == 2:
@@ -84,15 +122,31 @@ class Hero_Features(CTk.CTkFrame):
                 label.configure(text_color='#E63DF5')
             elif value[-1] ==5:
                 label.configure(text_color='#F09B24')
+
+
+            # Радио кнопка которая хранит описание способности и передает значение в переменную self.selected_feature
             descr_button = CTk.CTkRadioButton(self.features_bar,text="",value=value[3],variable=self.selected_feature)
             descr_button.grid(row=i,column=1,sticky='nws')
 
+        # Кнопка которая вызывает функцию get_description
         self.get_feauture_button = CTk.CTkButton(self,text='Подробнее о способности' ,image=info_icon,command=self.get_description)
         self.get_feauture_button.grid(row=2,column=0,padx=10,pady=(0,5),sticky='ew')
 
+        # Текстовой блок в котором будет храниться описание для способности
         self.descr_feature = CTk.CTkTextbox(self,wrap='word',corner_radius=10,height=180)
         self.descr_feature.grid(row=3,column=0,padx=10,pady=(0,5),sticky='new')
 
+        # Кнопка на случай желания поменять описание способности в базе данных
+        self.update_feature_button = CTk.CTkButton(self, text='Обновить описание', command=self.update_feature_descr)
+        self.update_feature_button.grid(row=4, column=0, sticky='new', pady=5, padx=(0, 10))
+
+    #Функция делает запрос на обновление поля Description для выбранной способности
+    def update_feature_descr(self):
+        pass
+
+    # Функция удаляет предыдущее записанное в текстовом боксе ,
+    # берет описание из переменной которая хранит описание для выбранной
+    # радио кнопки и записывает это описание в текстовой бокс
     def get_description(self,):
         self.descr_feature.delete('0.0', 'end')
         feature_description = self.selected_feature.get()
@@ -101,26 +155,39 @@ class Hero_Features(CTk.CTkFrame):
 
 
 #Фрейм для добавления способности в базу данных
-class Insert_Feature(CTk.CTkFrame):
+class Add_Feature(CTk.CTkFrame):
     def __init__(self,master):
         super().__init__(master)
-        self.add_feature_label = CTk.CTkLabel(self, text='Добавить Оссобенность')
-        self.add_feature_label.grid(row=0, column=0, padx=0, pady=0,columnspan=2, sticky='nsew')
-        self.add_feature_label.configure(fg_color='#606060')
 
+        # Лейбл с заголовком и настройкой заднего фона
+        self.title_label = CTk.CTkLabel(self, text='Добавить Оссобенность')
+        self.title_label.grid(row=0, column=0, padx=0, pady=0,columnspan=2, sticky='nsew')
+        self.title_label.configure(fg_color='#606060')
+
+        # Лейбл подсказка для окна ввода
         self.label = CTk.CTkLabel(self,text='Название :')
-        self.name_var = CTk.StringVar(value='')
         self.label.grid(row=1,column=0,padx=10,pady=20)
+
+        # Поле для ввода названия новой способности
         self.entry = CTk.CTkEntry(self)
         self.entry.grid(row=1,column=1,padx=(0,10),pady=20)
+
+        # Лейбл подсказка для Текстового Бокса который нужен для добавления Описания способности
         self.label_descr=CTk.CTkLabel(self,text='Описание',bg_color='gray')
         self.label_descr.grid(row=2,column=0,columnspan=2,padx=10,sticky='new')
+
+        # ТекстБокс для заполнения описания новой способности
         self.descr = CTk.CTkTextbox(self,wrap='word',corner_radius=0,height=180)
         self.descr.grid(row=3,column=0,columnspan=2,padx=10,pady=(0,5),sticky='new')
-        self.add_button = CTk.CTkButton(self,text='Добавить',command=self.add_feature)
+
+        # Кнопка для вызоыва функцию self.add_feature
+        self.add_button = CTk.CTkButton(self,text='Добавить',command=self.insert_feature)
         self.add_button.grid(row=4,column=0,columnspan=2,padx=10,pady=10,sticky='new')
 
-    def add_feature(self):
+    # Функция для добавления вписанных данных из текстовых полей в качестве новой записи  в таблицу Features базы данных
+    # Также функция вызывает всплывающее окно указывающее на то что способность успешно добавлена
+    # После поля для Названия и Текстовой бокс очищаются от ранее вписанных данных
+    def insert_feature(self):
         name = self.entry.get()
         descr = self.descr.get("0.0",'end')
         feature_info = [name,descr]
