@@ -142,7 +142,7 @@ def select_features():
         conn = sqlite3.connect('../dota_counter_picks.db')
         cur = conn.cursor()
 
-        cur.execute('''SELECT id,Name FROM Feature ''')
+        cur.execute('''SELECT id,Name,Description FROM Feature ''')
 
         results = cur.fetchall()
     except sqlite3.Error as err:

@@ -1,5 +1,6 @@
 from db_operation.select_from_tables import *
-from db_operation.insert_in_tables import (insert_all_heroes,
+from db_operation.update_tables import update_feature_description
+from db_operation.insert_in_tables import (
                                            hero_insert,
                                            feature_insert,
                                            insert_hero_feature)
@@ -8,13 +9,16 @@ from CTkMessagebox import CTkMessagebox
 import customtkinter as CTk
 from PIL import Image
 CTk.set_appearance_mode('dark')
-
+from pathlib import Path
 
 #Хранит иконку информации которую можно использовать в интерфейсе
-info_icon = CTk.CTkImage(light_image=Image.open('D:\\pycharm_projects\\Dota_counter_pick\\images\\icon_info.png'),
-                                  dark_image=Image.open("D:\\pycharm_projects\\Dota_counter_pick\\images\\icon_info.png"),
+info_icon = CTk.CTkImage(light_image=Image.open(str(Path.cwd().parent)+'\\images\\icon_info.png'),
+                                  dark_image=Image.open(str(Path.cwd().parent)+"\\images\\icon_info.png"),
                                   size=(30, 30))
 
+main_logo = CTk.CTkImage(light_image=Image.open(str(Path.cwd().parent)+'\\images\\dota_counter_picker.png'),
+                                  dark_image=Image.open(str(Path.cwd().parent)+"\\images\\dota_counter_picker.png"),
+                                  size=(150, 100))
 #Главный Фрейм
 class Main(CTk.CTk):
     def __init__(self):
@@ -40,9 +44,12 @@ class Hero_list(CTk.CTkFrame):
         self.title_label = CTk.CTkLabel(self,text='Способности Персонажей')
         self.title_label.grid(row=0,column=0,columnspan=2,sticky='new',pady=10)
 
+        self.select_hero_frame = CTk.CTkFrame(self,width=150,height=300)
+        self.select_hero_frame.grid(row=1, column=0,padx=(0,10), sticky='nsew')
+        self.select_hero_frame.grid_rowconfigure(0,weight=1)
         #Фрейм в котором  перебираются все персонажи (фрейм с автоматическим скроллом)
-        self.heroes_frame = CTk.CTkScrollableFrame(self,width=150,height=300)
-        self.heroes_frame.grid(row=1, column=0, sticky='nsew', padx=10,)
+        self.heroes_frame = CTk.CTkScrollableFrame(self.select_hero_frame,width=150,height=300)
+        self.heroes_frame.grid(row=0, column=0, sticky='nsew', padx=10,pady=(10,5))
         #Переменная для хранения айди Персонажа , которое определяется с помощью радио кнопок
         self.hero_id_var = CTk.IntVar(value=1)
 
@@ -57,8 +64,8 @@ class Hero_list(CTk.CTkFrame):
 
 
         #кнопка которая вызывает функцию get_hero разположена внутри фрейм класса Hero_list
-        self.get_hero_button = CTk.CTkButton(self,text='Выбрать',command=self.get_hero)
-        self.get_hero_button.grid(row=2,column=0,sticky='new',padx=10,pady=5)
+        self.get_hero_button = CTk.CTkButton(self.select_hero_frame,text='Выбрать',command=self.get_hero)
+        self.get_hero_button.grid(row=1,column=0,sticky='new',padx=5,pady=5)
 
 
 
@@ -75,6 +82,8 @@ class Hero_list(CTk.CTkFrame):
         self.hero_feature_frame = Hero_features_menu(self,hero=hero_info)
         self.hero_feature_frame.grid(row=1, column=1,padx=(0,10), sticky='new')
 
+        self.insert_feature_to_Hero = Insert_Feature_to_Hero(self)
+        self.insert_feature_to_Hero.grid(row=1, column=2, padx=(0, 10), sticky='new')
 
 
 class Hero_features_menu(CTk.CTkFrame):
@@ -85,7 +94,7 @@ class Hero_features_menu(CTk.CTkFrame):
         self.hero_label.grid(row=0,column=0,sticky='new')
 
         # Скроллбар фрейм в котором будут храниться все способности выбранного персонажа  в виде радио кнопок
-        self.features_bar = CTk.CTkScrollableFrame(self,width=300, height=200)
+        self.features_bar = CTk.CTkScrollableFrame(self,width=270, height=200)
         self.features_bar.grid(row=1,column=0,sticky='new',padx=10,pady=5)
 
         #переменная в которой будет список способностей для персонажа с выбранным айди
@@ -125,7 +134,7 @@ class Hero_features_menu(CTk.CTkFrame):
 
 
             # Радио кнопка которая хранит описание способности и передает значение в переменную self.selected_feature
-            descr_button = CTk.CTkRadioButton(self.features_bar,text="",value=value[3],variable=self.selected_feature)
+            descr_button = CTk.CTkRadioButton(self.features_bar,text="",value=value[2]+' :\n'+value[3],variable=self.selected_feature)
             descr_button.grid(row=i,column=1,sticky='nws')
 
         # Кнопка которая вызывает функцию get_description
@@ -138,11 +147,22 @@ class Hero_features_menu(CTk.CTkFrame):
 
         # Кнопка на случай желания поменять описание способности в базе данных
         self.update_feature_button = CTk.CTkButton(self, text='Обновить описание', command=self.update_feature_descr)
-        self.update_feature_button.grid(row=4, column=0, sticky='new', pady=5, padx=(0, 10))
+        self.update_feature_button.grid(row=4, column=0, sticky='new', pady=(0,5), padx=(10, 10))
 
     #Функция делает запрос на обновление поля Description для выбранной способности
     def update_feature_descr(self):
-        pass
+        feature_name = self.selected_feature.get().split(' :\n')[0]
+        feature_description = self.descr_feature.get('0.0','end').split(' :\n')[1]
+        update_feature_description(feature_name,feature_description)
+        CTkMessagebox(title="Обновлено", message=f'Описание способности "{feature_name}" было обновлено !'
+                                                 f'\n Чтобы в программе описание обновилось перевыберете персонажа ', icon="check")
+
+
+
+
+
+
+
 
     # Функция удаляет предыдущее записанное в текстовом боксе ,
     # берет описание из переменной которая хранит описание для выбранной
@@ -184,6 +204,11 @@ class Add_Feature(CTk.CTkFrame):
         self.add_button = CTk.CTkButton(self,text='Добавить',command=self.insert_feature)
         self.add_button.grid(row=4,column=0,columnspan=2,padx=10,pady=10,sticky='new')
 
+        self.grid_columnconfigure(0,weight=1)
+        self.grid_rowconfigure(5,weight=1)
+        self.logo_label = CTk.CTkLabel(self,image=main_logo,text='')
+        self.logo_label.grid(row=5,column=0,columnspan=2,padx=(10,5),pady=10)
+
     # Функция для добавления вписанных данных из текстовых полей в качестве новой записи  в таблицу Features базы данных
     # Также функция вызывает всплывающее окно указывающее на то что способность успешно добавлена
     # После поля для Названия и Текстовой бокс очищаются от ранее вписанных данных
@@ -196,6 +221,31 @@ class Add_Feature(CTk.CTkFrame):
         self.entry.delete('0','end')
         self.descr.delete('0.0','end')
 
+class Insert_Feature_to_Hero(CTk.CTkFrame):
+    def __init__(self,master):
+        super().__init__(master)
+        self.grid_columnconfigure(0,weight=1)
+        self.title_label = CTk.CTkLabel(self,text='Назначить способность герою')
+        self.title_label.grid(row=0,column=0,pady=5,padx=10,sticky='ew')
+
+        self.choice_feature_frame=CTk.CTkScrollableFrame(self)
+        self.choice_feature_frame.grid(row=1,column=0,pady=5,padx=10,sticky='new')
+
+        self.choice_var = CTk.IntVar(value=0)
+        features_list = select_features()
+        for i, feature in enumerate(features_list):
+            label = CTk.CTkRadioButton(self.choice_feature_frame,text=f'"{feature[1]}"',value=feature[0],variable=self.choice_var)
+            label.grid(row=i,column=0,sticky='new',pady=5)
+
+        self.choice_button = CTk.CTkButton(self,text='Выбрать',command=self.select_feature)
+        self.choice_button.grid(row=2,column=0,pady=5,padx=10,sticky='new')
+
+        self.SliderVar = CTk.IntVar(value=1)
+        self.progressbar = CTk.CTkProgressBar(self, orientation="horizontal")
+        self.slider = CTk.CTkSlider(self, from_=1, to=5,number_of_steps=4, variable=self.SliderVar)
+        self.slider.grid(row=3,column=0,pady=5,padx=10,sticky='new')
+    def select_feature(self):
+        pass
 
 if __name__ == '__main__':
     main = Main()

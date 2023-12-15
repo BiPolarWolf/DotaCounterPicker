@@ -1,15 +1,15 @@
 import requests
 import sqlite3
 
-Hero_obj =requests.get('https://api.opendota.com/api/heroes')
+#Hero_obj =requests.get('https://api.opendota.com/api/heroes')
 
 #json список из словарей в которых есть информация о персонаже
-Heroes = Hero_obj.json()
+#Heroes = Hero_obj.json()
 
 #Функция перебирает все записи о героях из API и добавляет каждого в базу через фунцкию hero_insert
-def insert_all_heroes(Heroes):
-    for hero in Heroes:
-        hero_insert(hero_info=hero)
+#def insert_all_heroes(Heroes):
+#    for hero in Heroes:
+ #       hero_insert(hero_info=hero)
 
 
 #Функция добавляет персонажа в базу данных таблицу Heroes
