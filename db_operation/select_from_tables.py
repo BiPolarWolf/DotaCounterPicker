@@ -14,23 +14,6 @@ def main():
    # select_counter_features(loser_id)
 
 #выбирает все оссобенности определенного персонажа по его айди
-def select_hero_features(hero_id):
-    conn = None
-    results = []
-    try:
-        conn = sqlite3.connect('../dota_counter_picks.db')
-        cur = conn.cursor()
-        cur.execute('''SELECT hero_id,feature_id,level FROM Hero_feature WHERE hero_id == ?''',(hero_id,))
-
-        results = cur.fetchall()
-    except sqlite3.Error as err:
-        print('Ошибка базы данных ', err)
-    finally:
-        if conn != None:
-            conn.close()
-
-        return results
-
 def select_hero_features1(hero_id):
     conn = None
     results = []
@@ -54,15 +37,19 @@ def select_hero_features1(hero_id):
 
         return results
 
-
-#Выбирает все записи о конкурирующих между собой способностях по id оссобенности которая слабее
-def  select_counter_features(loser_id):
+def select_feature_heroes(feature_id):
     conn = None
     results = []
     try:
         conn = sqlite3.connect('../dota_counter_picks.db')
         cur = conn.cursor()
-        cur.execute('''SELECT * FROM Feature_vs_feature WHERE loser_id == ?''',(loser_id,))
+        cur.execute('''SELECT Heroes.Name,Feature.Name,level
+            FROM Hero_feature
+            JOIN Heroes ON Hero_feature.hero_id = Heroes.id
+            JOIN Feature ON Hero_feature.feature_id == Feature.id
+            WHERE feature_id == ?
+            ORDER BY level DESC
+            ''', (feature_id,))
 
         results = cur.fetchall()
     except sqlite3.Error as err:
@@ -72,6 +59,7 @@ def  select_counter_features(loser_id):
             conn.close()
 
         return results
+
 
 # возвращает полное описание Персонажа  по его id
 def select_hero_info(hero_id):
@@ -172,7 +160,7 @@ def select_features():
 
 
 
-
+#Выбирает все записи о конкурирующих между собой способностях по id оссобенности которая слабее
 def select_winners_features(loser_id):
     conn = None
     results = []
@@ -183,7 +171,7 @@ def select_winners_features(loser_id):
                              FROM Feature_vs_feature
                              JOIN Feature ON Feature.id == Feature_vs_feature.winner_id
                              WHERE loser_id == ?
-         ORDER BY level strong DESC
+         ORDER BY strong DESC
          ''',(loser_id,))
 
         results = cur.fetchall()

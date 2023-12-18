@@ -34,15 +34,15 @@ class Redactor_menu(CTk.CTk):
 
 
 class Heroes_Scroll_Frame(CTk.CTkScrollableFrame):
-    def __init__(self,master,width,height,text):
+    def __init__(self,master,width,height):
         super().__init__(master,width,height)
+
         # Переменная для хранения айди Персонажа , которое определяется с помощью радио кнопок
         self.hero_id_var = CTk.IntVar(value=1)
-        if text == '':
-            # функция  select_heroes выбирает все айди и имена для всех персонажей из таблицы Heroes
-            heroes = select_heroes()
-        else:
-            heroes = select_heroes_entry(text)
+
+
+        # функция  select_heroes выбирает все айди и имена для всех персонажей из таблицы Heroes
+        heroes = select_heroes()
 
         # внутри фрейма heroes_frame создаются радио кнопки соответствующие персонажу
         # (информацию о выбранной кнопке будет хранить self.hero_id_var)
@@ -241,6 +241,8 @@ class Add_Feature(CTk.CTkFrame):
         CTkMessagebox(title="Способность добавлена", message=f'Способность "{name}" успешно добавлена ! ',icon="check")
         self.entry.delete('0','end')
         self.descr.delete('0.0','end')
+
+
 
 class Feature_list_frame(CTk.CTkScrollableFrame):
     def __init__(self,master,features_list):
