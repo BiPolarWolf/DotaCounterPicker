@@ -100,6 +100,7 @@ def create_feature_vs_feature():
                         id INTEGER PRIMARY KEY,
                         winner_id INTEGER,
                         loser_id INTEGER,
+                        strong INTEGER,
                         FOREIGN KEY (winner_id) REFERENCES Feature(id),
                         FOREIGN KEY (loser_id) REFERENCES Feature(id)
 

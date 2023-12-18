@@ -54,17 +54,15 @@ def feature_insert(feature_info):
             conn.close()
 
 #Функция для добавления Герою оссобенности из списка и указанию силы этой оссобенности
-def insert_hero_feature(hero_feature_info:dict):
+def insert_hero_feature(hero_id,feature_id,level):
     conn = None
     try:
         conn = sqlite3.connect('../dota_counter_picks.db')
         cur = conn.cursor()
 
         cur.execute('''INSERT INTO Hero_feature(hero_id,feature_id,level)
-                            VALUES (?,?,?)''',
-                    (hero_feature_info['hero_id'],
-                     hero_feature_info['feature_id'],
-                     hero_feature_info['level']))
+                            VALUES (?,?,?)''',(hero_id,feature_id,level))
+
         print('К Герою добавлена новая оссобенность')
 
         conn.commit()
@@ -77,7 +75,28 @@ def insert_hero_feature(hero_feature_info:dict):
             conn.close()
 
 
+
+def insert_feature_vs_feature(win_id,lose_id,strong):
+    conn = None
+    try:
+        conn = sqlite3.connect('../dota_counter_picks.db')
+        cur = conn.cursor()
+
+        cur.execute('''INSERT INTO Feature_vs_feature(winner_id,loser_id,strong)
+                            VALUES (?,?,?)''',(win_id,lose_id,strong))
+
+        print('Добавлено новое отношение способностей')
+
+        conn.commit()
+
+    except sqlite3.Error as err:
+        print('Ошибка базы данных ', err)
+
+    finally:
+        if conn != None:
+            conn.close()
+
 #срабатывает функция для добавления всех персонажей.
 
-if __name__ == '__main__':
-    insert_all_heroes(Heroes)
+#if __name__ == '__main__':
+  #  insert_all_heroes(Heroes)
