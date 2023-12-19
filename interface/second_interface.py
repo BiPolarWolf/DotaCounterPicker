@@ -40,7 +40,7 @@ class Search_bar(CTk.CTkFrame):
 class Choice_hero_menu(CTk.CTkFrame):
     def __init__(self,master):
         super().__init__(master)
-        self.grid_rowconfigure(0,weight=1)
+        self.grid_rowconfigure((0,1,2,3),weight=1)
         self.hero_select_frame = CTk.CTkFrame(self)
         self.hero_select_frame.grid(row=0, column=0, sticky='new', padx=5, pady=(10, 5))
         self.hero_select_frame.grid_rowconfigure(1,weight=1)
@@ -99,6 +99,16 @@ class Choice_hero_menu(CTk.CTkFrame):
                                                  command=self.get_feature_heroes)
         self.choice_feature_heroes.grid(row=4, column=0, padx=10, pady=(5, 10), sticky='new')
 
+        self.feature_heroes_frame = CTk.CTkFrame(self,width=300)
+        self.feature_heroes_frame.grid(row=0,column=3,sticky='nsew', padx=5, pady=10)
+        self.feature_heroes_frame.grid_rowconfigure(1,weight=1)
+
+        self.feature_heroes_label = CTk.CTkLabel(self.feature_heroes_frame, text=f'Герои со способностью')
+        self.feature_heroes_label.grid(row=0, column=0, sticky='new', padx=5, pady=5)
+
+        self.winners_heroes_scroll = Winner_Heroes_frame(self.feature_heroes_frame,width=250,feature_id=0)
+        self.winners_heroes_scroll.grid(row=1, column=0, sticky='news', padx=5, pady=5)
+
 
     def get_feature_heroes(self):
         feature_id = self.counter_features.get_feature_id()
@@ -134,6 +144,11 @@ class Choice_hero_menu(CTk.CTkFrame):
         hero_features_list = select_hero_features1(hero_id=hero_id)
         self.hero_features_scroll= Hero_Features_Frame(self.hero_features_frame,hero_features_list,width=250)
         self.hero_features_scroll.grid(row=1, column=0, sticky='new', padx=10,pady=10)
+
+    def get_feature_heroes(self):
+        feature_id = self.counter_features.get_feature_id()
+        self.winners_heroes_scroll = Winner_Heroes_frame(self.feature_heroes_frame, width=250, feature_id=feature_id)
+        self.winners_heroes_scroll.grid(row=1, column=0, sticky='news', padx=5, pady=5)
 
 
 
