@@ -11,7 +11,8 @@ from CTkMessagebox import CTkMessagebox
 import customtkinter as CTk
 CTk.set_appearance_mode('dark')
 
-
+import pyperclip
+pyperclip.paste()
 
 
 #Главный Фрейм
@@ -66,14 +67,40 @@ class Hero_list(CTk.CTkFrame):
 
         self.select_hero_frame = CTk.CTkFrame(self,width=150,height=300)
         self.select_hero_frame.grid(row=1, column=0,padx=(0,10), sticky='nsew')
-        self.select_hero_frame.grid_rowconfigure(0,weight=1)
+        self.select_hero_frame.grid_rowconfigure(1,weight=1)
+
+        self.search_hero_frame = CTk.CTkFrame(self.select_hero_frame)
+        self.search_hero_frame.grid(row=0, column=0, sticky='nsew', padx=10,pady=(10,5))
+
+        self.entry = CTk.CTkEntry(self.search_hero_frame, placeholder_text='Кого Законтрить ?')
+        self.entry.grid(column=0, row=0, sticky='nsew', padx=5, pady=(10, 5))
+        self.search_button = CTk.CTkButton(self.search_hero_frame, text='Поиск', command=self.search, width=50)
+        self.search_button.grid(column=1, row=0, sticky='nsew', padx=5, pady=(10, 5))
+
         #Фрейм в котором  перебираются все персонажи (фрейм с автоматическим скроллом)
         self.heroes_frame = Heroes_Scroll_Frame(self.select_hero_frame,width=150,height=300)
-        self.heroes_frame.grid(row=0, column=0, sticky='nsew', padx=10,pady=(10,5))
+        self.heroes_frame.grid(row=1, column=0, sticky='nsew', padx=10,pady=(10,5))
 
         #кнопка которая вызывает функцию get_hero разположена внутри фрейм класса Hero_list
         self.get_hero_button = CTk.CTkButton(self.select_hero_frame,text='Выбрать',command=self.get_hero)
-        self.get_hero_button.grid(row=1,column=0,sticky='new',padx=5,pady=5)
+        self.get_hero_button.grid(row=2,column=0,sticky='new',padx=5,pady=5)
+
+
+    def search(self):
+        entry_hero_name = self.entry.get()
+        heroes = select_heroes()
+
+        for id,name in heroes:
+            if entry_hero_name == name:
+                hero_id = id
+                hero_info = select_hero_info(hero_id)
+
+                # создается Экземпляр класса Hero_features_menu который является новым фреймом для отображения способностей персонажа
+                self.hero_feature_frame = Hero_features_menu(self, hero=hero_info)
+                self.hero_feature_frame.grid(row=1, column=1, padx=(0, 10), sticky='new')
+
+                self.insert_feature_to_Hero = Insert_Feature_to_Hero(self, hero_id)
+                self.insert_feature_to_Hero.grid(row=1, column=2, padx=(0, 10), sticky='new')
 
 
 
@@ -220,10 +247,11 @@ class Add_Feature(CTk.CTkFrame):
         # ТекстБокс для заполнения описания новой способности
         self.descr = CTk.CTkTextbox(self,wrap='word',corner_radius=0,height=180)
         self.descr.grid(row=3,column=0,columnspan=2,padx=10,pady=(0,5),sticky='new')
-
+        self.paste_text_button = CTk.CTkButton(self,text='Вставить текст',command=self.paste_descr)
+        self.paste_text_button.grid(row=4,column=0,columnspan=2,padx=10,pady=10,sticky='new')
         # Кнопка для вызоыва функцию self.add_feature
         self.add_button = CTk.CTkButton(self,text='Добавить',command=self.insert_feature)
-        self.add_button.grid(row=4,column=0,columnspan=2,padx=10,pady=10,sticky='new')
+        self.add_button.grid(row=5,column=0,columnspan=2,padx=10,pady=10,sticky='new')
 
         self.grid_columnconfigure(0,weight=1)
         self.grid_rowconfigure(5,weight=1)
@@ -242,6 +270,9 @@ class Add_Feature(CTk.CTkFrame):
         self.entry.delete('0','end')
         self.descr.delete('0.0','end')
 
+    def paste_descr(self):
+        text = pyperclip.paste()
+        self.descr.insert('end',text)
 
 
 class Feature_list_frame(CTk.CTkScrollableFrame):

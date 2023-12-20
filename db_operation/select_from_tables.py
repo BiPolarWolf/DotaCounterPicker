@@ -93,7 +93,7 @@ def select_heroes():
         conn = sqlite3.connect('../dota_counter_picks.db')
         cur = conn.cursor()
 
-        cur.execute('''SELECT id,Name FROM Heroes ORDER BY id ''')
+        cur.execute('''SELECT id,Name FROM Heroes ORDER BY Name ''')
 
         results = cur.fetchall()
     except sqlite3.Error as err:

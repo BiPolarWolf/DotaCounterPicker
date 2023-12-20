@@ -12,6 +12,8 @@ from main_interface import  Heroes_Scroll_Frame,Feature_list_frame
 import customtkinter as CTk
 CTk.set_appearance_mode('dark')
 
+
+#Основное окно
 class Counter_Picker(CTk.CTk):
     def __init__(self):
         super().__init__()
@@ -22,45 +24,49 @@ class Counter_Picker(CTk.CTk):
         self.choice_hero_menu.grid(row=0, column=0, sticky='nsew', padx=10,pady=(10,5))
 
 
-class Search_bar(CTk.CTkFrame):
-    def __init__(self,master):
-        super().__init__(master)
-
-        self.entry= CTk.CTkEntry(self,placeholder_text='Кого Законтрить ?')
-        self.entry.grid(column=0,row=0,sticky='nsew',padx=5,pady=(10,5))
-        global text
-        self.search_button = CTk.CTkButton(self,text='Поиск',command=self.search)
-        self.search_button.grid(column=1, row=0, sticky='nsew', padx=5, pady=(10, 5))
-
-    def search(self):
-        return self.entry.get()
 
 
 
+
+# Главный фрейм в котором все находится
 class Choice_hero_menu(CTk.CTkFrame):
     def __init__(self,master):
         super().__init__(master)
         self.grid_rowconfigure((0,1,2,3),weight=1)
+
+        #Первый самый левый фрейм - выбор персонажа
         self.hero_select_frame = CTk.CTkFrame(self)
         self.hero_select_frame.grid(row=0, column=0, sticky='new', padx=5, pady=(10, 5))
         self.hero_select_frame.grid_rowconfigure(1,weight=1)
-        self.search_bar = Search_bar(self.hero_select_frame)
+
+
+        # ввод имени персонажа и открытие его способности через кнопку
+        self.search_bar = CTk.CTkFrame(self.hero_select_frame)
         self.search_bar.grid(row=0, column=0, sticky='nsew', padx=10, pady=(10, 5))
+        self.entry= CTk.CTkEntry(self.search_bar,placeholder_text='Кого Законтрить ?')
+        self.entry.grid(column=0,row=0,sticky='nsew',padx=5,pady=(10,5))
+        self.search_button = CTk.CTkButton(self.search_bar,text='Поиск',command=self.search,width=50)
+        self.search_button.grid(column=1, row=0, sticky='nsew', padx=5, pady=(10, 5))
+
+        #фрейм в котором будет список персонажей на выбор
         self.heroes_scroll_frame = Heroes_Scroll_Frame(self.hero_select_frame,width=150,height=410)
         self.heroes_scroll_frame.grid(row=1, column=0, sticky='nsew', padx=10,pady=(10,5))
-
+        # Кнопка для выбора персонажа
         self.hero_choice_button = CTk.CTkButton(self.hero_select_frame,text='Выбрать',command=self.choice_hero)
         self.hero_choice_button.grid(row=2,column=0,sticky='nsew', padx=10,pady=10)
 
+        #Второй фрейм в котором показываются способности выбранного персонажа , можно увидеть их описание
         self.hero_features_frame=CTk.CTkFrame(self)
         self.hero_features_frame.grid(row=0, column=1, sticky='new', padx=5, pady=(10, 5))
         self.hero_label = CTk.CTkLabel(self.hero_features_frame, text=f'Способности героев')
         self.hero_label.grid(row=0, column=0, sticky='new',)
 
+        # скролл фрейм для вывода всех способностей выбранного персонажа (автоматический создается пустым)
         self.hero_features_scroll= Hero_Features_Frame(self.hero_features_frame,hero_features_list=[],width=250)
         self.hero_features_scroll.grid(row=1, column=0, sticky='new', padx=10,pady=10)
 
 
+        # Кнопка которая выполняет функция get_description
         self.get_feauture_button = CTk.CTkButton(self.hero_features_frame, text='Подробнее о способности', image=info_icon,
                                                  command=self.get_description)
         self.get_feauture_button.grid(row=2, column=0, padx=10, pady=(0, 5), sticky='ew')
@@ -70,71 +76,93 @@ class Choice_hero_menu(CTk.CTkFrame):
         self.descr_feature = CTk.CTkTextbox(self.hero_features_frame, wrap='word', corner_radius=10, height=180)
         self.descr_feature.grid(row=3, column=0, padx=10, pady=(5,10), sticky='new')
 
-
+        #Кнока которая выполняет функцию get_counter_features
         self.choice_lose_feature = CTk.CTkButton(self.hero_features_frame, text='Найти Контр-Способность',command=self.get_counter_features)
         self.choice_lose_feature.grid(row=4, column=0, padx=10, pady=(5,10), sticky='new')
 
+        #Создается 3ий фрейм в котором будет выводится контр способности для выбранной способности
         self.winner_features_frame=CTk.CTkFrame(self,width=300)
         self.winner_features_frame.grid(row=0,column=2,sticky='new', padx=5, pady=10)
 
+        #Лейбл в котором указана способность для которой подбираются ее контр способности
         self.loser_feature_label = CTk.CTkLabel(self.winner_features_frame, text=f'Контр способности')
         self.loser_feature_label.grid(row=0, column=0, sticky='new',padx=5, pady=5)
 
+        # Скролл фрейм в котором будет выводит список контр способностей для выбранной способности
         self.counter_features = Winners_list_frame(self.winner_features_frame,features_list=[],width=250,height=200)
         self.counter_features.grid(row=1,column=0,sticky='new',padx=5, pady=5)
 
-
-
+        # Кнопка которая выполняет функция get_winner_description
         self.get_feauture_button1 = CTk.CTkButton(self.winner_features_frame, text='Подробнее о способности',
                                                  image=info_icon,
                                                  command=self.get_winner_description)
-
         self.get_feauture_button1.grid(row=2, column=0, padx=10, pady=(0, 5), sticky='ew')
 
         # Текстовой блок в котором будет храниться описание для способности
         self.descr_feature1 = CTk.CTkTextbox(self.winner_features_frame, wrap='word', corner_radius=10, height=180)
         self.descr_feature1.grid(row=3, column=0, padx=10, pady=(5, 10), sticky='new')
 
+        # Кнока которая выполняет функцию get_feature_heroes (находит всех персонажей с этой способностью)
         self.choice_feature_heroes = CTk.CTkButton(self.winner_features_frame, text='Герои со способностью',
                                                  command=self.get_feature_heroes)
         self.choice_feature_heroes.grid(row=4, column=0, padx=10, pady=(5, 10), sticky='new')
 
+        #Фрейм для вывода списка Персонажей с выбранной способностью
         self.feature_heroes_frame = CTk.CTkFrame(self,width=300)
         self.feature_heroes_frame.grid(row=0,column=3,sticky='nsew', padx=5, pady=10)
         self.feature_heroes_frame.grid_rowconfigure(1,weight=1)
 
+        #Заголовок в котором указана способность
         self.feature_heroes_label = CTk.CTkLabel(self.feature_heroes_frame, text=f'Герои со способностью')
         self.feature_heroes_label.grid(row=0, column=0, sticky='new', padx=5, pady=5)
 
-        self.winners_heroes_scroll = Winner_Heroes_frame(self.feature_heroes_frame,width=250,feature_id=0)
+        # Скролл Фрейм со списком Героев у которых есть эти способности
+        self.winners_heroes_scroll = Winner_Heroes_frame(self.feature_heroes_frame,width=310,feature_id=0)
         self.winners_heroes_scroll.grid(row=1, column=0, sticky='news', padx=5, pady=5)
 
 
-    def get_feature_heroes(self):
-        feature_id = self.counter_features.get_feature_id()
-        heroes = select_feature_heroes(feature_id)
+    # функция которая берет введенное пользователем имя и проверяет есть ли такой персонаж в баже , если есть
+    # то выдает способности этого персонажа , если нет , то ничего не делает
+    def search(self):
+        entry_hero_name = self.entry.get()
+        heroes = select_heroes()
 
+        for id,name in heroes:
+            if entry_hero_name == name:
+                hero_id = id
+                hero_info = select_hero_info(hero_id)
+                self.hero_label.configure(text=f'Способности героя : {hero_info[1]}')
 
+                # переменная в которой будет список способностей для персонажа с выбранным айди
+                hero_features_list = select_hero_features1(hero_id=hero_id)
+                self.hero_features_scroll = Hero_Features_Frame(self.hero_features_frame, hero_features_list, width=250)
+                self.hero_features_scroll.grid(row=1, column=0, sticky='new', padx=10, pady=10)
+
+    # Функция которая отвечает за выдачу описания контрящих способностей в текстбоксе
     def get_winner_description(self):
         feature_id = self.counter_features.get_feature_id()
         feature_info = select_feature_info(feature_id)
         self.descr_feature1.delete('0.0','end')
         self.descr_feature1.insert('0.0',feature_info[2])
 
-    def get_counter_features(self):
 
+    # Функция которая возвращает список контр способностей  для одной способноси и меняет текст лейбла
+    def get_counter_features(self):
         loser_id = self.hero_features_scroll.get_choice_feature()
         loser_name = select_feature_info(loser_id )[1]
         features_list = select_winners_features(loser_id)
         self.counter_features = Winners_list_frame(self.winner_features_frame, features_list=features_list, width=250,height=200)
         self.counter_features.grid(row=1, column=0, sticky='new', padx=5, pady=5)
         self.loser_feature_label.configure(text=f'Контрят "{loser_name}"')
+
+    # Функция которая отвечает за выдачу описания  способностей персонажа в текстбоксе
     def get_description(self):
         feature_id = self.hero_features_scroll.get_choice_feature()
         select_feature = select_feature_info(feature_id)
         self.descr_feature.delete('0.0','end')
         self.descr_feature.insert('0.0',select_feature[-1])
 
+    # Функция которая выдает способности для выбранного персонажа и меняет текст лейбла для этого персонажа
     def choice_hero(self):
         hero_id = self.heroes_scroll_frame.get_hero_id()
         hero_info = select_hero_info(hero_id)
@@ -145,14 +173,18 @@ class Choice_hero_menu(CTk.CTkFrame):
         self.hero_features_scroll= Hero_Features_Frame(self.hero_features_frame,hero_features_list,width=250)
         self.hero_features_scroll.grid(row=1, column=0, sticky='new', padx=10,pady=10)
 
+    # выдает список Героев для выбранной способности и меняет текста Лейбла для этой способности
     def get_feature_heroes(self):
         feature_id = self.counter_features.get_feature_id()
-        self.winners_heroes_scroll = Winner_Heroes_frame(self.feature_heroes_frame, width=250, feature_id=feature_id)
+        feature_info = select_feature_info(feature_id)
+        self.feature_heroes_label.configure(text=f'Герои с {feature_info[1]}')
+
+        self.winners_heroes_scroll = Winner_Heroes_frame(self.feature_heroes_frame, width=300, feature_id=feature_id)
         self.winners_heroes_scroll.grid(row=1, column=0, sticky='news', padx=5, pady=5)
 
 
 
-
+#Класс фрейма в котором будут генерироваться способности которые контрят выбранную способность
 class Winners_list_frame(CTk.CTkScrollableFrame):
     def __init__(self,master,features_list,width,height):
         super().__init__(master,width,height)
@@ -179,7 +211,7 @@ class Winners_list_frame(CTk.CTkScrollableFrame):
         return self.Value_Var.get()
 
 
-
+#Класс Фрейма в котором будут Генерироваться Герои с выбранной способностью
 class Winner_Heroes_frame(CTk.CTkScrollableFrame):
     def __init__(self, master, feature_id,width):
         super().__init__(master,width)
@@ -213,45 +245,7 @@ class Winner_Heroes_frame(CTk.CTkScrollableFrame):
                 counter_hero_info.configure(text_color='#F09B24')
 
 
-
-
-
-class Winner_Features_Frame(CTk.CTkFrame):
-    def __init__(self,master,loser_feature_id):
-        super().__init__(master)
-        self.loser_feature_label = CTk.CTkLabel(self, text=f'Противодействующие способности :')
-        self.loser_feature_label.grid(row=0, column=0, sticky='new')
-
-        winner_features = select_winners_features(loser_feature_id)
-        self.winner_features_list = Winners_list_frame(self,features_list=winner_features,width=250,height=200)
-        self.winner_features_list.grid(row=1, column=0, sticky='new', padx=10, pady=5)
-
-        # Кнопка которая вызывает функцию get_description
-        self.get_feauture_button = CTk.CTkButton(self, text='Подробнее о способности', image=info_icon,
-                                                 command=self.get_description)
-        self.get_feauture_button.grid(row=2, column=0, padx=10, pady=(0, 5), sticky='ew')
-
-        # Текстовой блок в котором будет храниться описание для способности
-        self.descr_feature = CTk.CTkTextbox(self, wrap='word', corner_radius=10, height=180)
-        self.descr_feature.grid(row=3, column=0, padx=10, pady=(0, 5), sticky='new')
-
-        self.choice_winner_button = CTk.CTkButton(self,text='Найти Героев с этой способностью',command=self.get_heroes)
-        self.choice_winner_button.grid(row=4, column=0, sticky='new', padx=10, pady=5)
-
-
-    def get_heroes(self):
-        feature_id = self.winner_features_list.get_feature_id()
-        self.winner_heroes_frame = Winner_Heroes_frame(self,feature_id,width=300)
-        self.winner_heroes_frame.grid(row=1, column=1, sticky='new', padx=10, pady=5,rowspan=4)
-
-
-    def get_description(self):
-        self.descr_feature.delete('0.0', 'end')
-        feature_id =self.winner_features_list.get_feature_id()
-        feature_description = select_feature_info(feature_id)[2]
-        self.descr_feature.insert('0.0',feature_description)
-
-
+# Класса Фрейм в котором будут генерироваться способности для выбранного Героя
 class Hero_Features_Frame(CTk.CTkScrollableFrame):
     def __init__(self,master,hero_features_list,width):
         super().__init__(master,width)
@@ -290,47 +284,6 @@ class Hero_Features_Frame(CTk.CTkScrollableFrame):
     def get_choice_feature(self):
         return self.features_var.get()
 
-
-
-
-
-
-
-
-
-'''        # Кнопка которая вызывает функцию get_description
-        self.get_feauture_button = CTk.CTkButton(self, text='Подробнее о способности', image=info_icon,
-                                                 command=self.get_description)
-        self.get_feauture_button.grid(row=2, column=0, padx=10, pady=(0, 5), sticky='ew')
-
-        # Текстовой блок в котором будет храниться описание для способности
-        self.descr_feature = CTk.CTkTextbox(self, wrap='word', corner_radius=10, height=180)
-        self.descr_feature.grid(row=3, column=0, padx=10, pady=(0, 5), sticky='new')
-
-
-        self.feature_choice_button = CTk.CTkButton(self,
-                                                   text='Найти противодействующие способности',
-                                                   command=self.find_win_features)
-        self.feature_choice_button.grid(column=0, row=4, sticky='new', padx=10, pady=5)
-
-    # Функция удаляет предыдущее записанное в текстовом боксе ,
-    # берет описание из переменной которая хранит описание для выбранной
-    # радио кнопки и записывает это описание в текстовой бокс
-    def get_description(self):
-        self.descr_feature.delete('0.0', 'end')
-        feature_id = self.features_var.get()
-        feature_info = select_feature_info(feature_id)
-        feature_description = feature_info[2]
-        self.descr_feature.insert('0.0',feature_description)
-
-    def get_feature_id(self):
-        return self.features_var.get()
-
-    def find_win_features(self):
-        loser_feature_id = self.get_feature_id()
-        print(loser_feature_id)
-        self.choice_winner_menu = Winner_Features_Frame(self,loser_feature_id)
-        self.choice_winner_menu.grid(column=1,row=1,sticky='nsew', padx=10,pady=5,rowspan=5)'''
 
 if __name__ == '__main__':
     counter_picker = Counter_Picker()
